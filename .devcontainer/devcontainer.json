@@ -1,5 +1,6 @@
 {
-    "image": "gitpod/workspace-full",
+	"build": {"dockerfile": "Dockerfile"},
+    // "image": "gitpod/workspace-full",
 
 	// Borrowed from default Rust devcontainer
     "customizations": {
