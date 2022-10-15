@@ -1,5 +1,5 @@
 {
-    "image": "gitpod/workspace-rust",
+    "image": "gitpod/workspace-full",
 
 	// Borrowed from default Rust devcontainer
     "customizations": {
@@ -21,7 +21,9 @@
 				"mutantdino.resourcemonitor",
 				"rust-lang.rust-analyzer",
 				"tamasfe.even-better-toml",
-				"serayuzgur.crates"
+				"serayuzgur.crates",
+				"svelte.svelte-vscode",
+    			"tauri-apps.tauri-vscode"
 			]
 		}
 	}
