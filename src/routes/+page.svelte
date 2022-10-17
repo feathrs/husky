@@ -1,5 +1,6 @@
 <script>
   import Greet from "$lib/Greet.svelte";
+  import Login from "$lib/Login.svelte";
 </script>
 
 <h1>Welcome to Tauri!</h1>
@@ -20,6 +21,10 @@
 
 <div class="row">
   <Greet />
+</div>
+
+<div class="row">
+  <Login />
 </div>
 
 <style>
