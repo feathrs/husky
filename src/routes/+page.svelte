@@ -1,38 +1,31 @@
-<script>
-  import Greet from "$lib/Greet.svelte";
-  import Login from "$lib/Login.svelte";
+<!--
+  This is the root page -- This is practically a splash screen.
+  Fetch everything out of the database, init anything in the background,
+  and then push the user to login/account or login/character
+-->
+
+<script lang="ts">
+  import {username, password, autoLogin} from "$lib/account";
+  import {login} from "$lib/rust";
+  import {goto} from "$app/navigation"
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    if ($autoLogin) {
+      // I promise that if autoLogin is set, the credentials are set.
+      await doLogin();
+    }
+  })
+
+  async function doLogin() {
+    await login($username!, $password!);
+    goto("/characters");
+  }
 </script>
 
-<h1>Welcome to Tauri!</h1>
-
-<div class="row">
-  <a href="https://vitejs.dev" target="_blank">
-    <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-  </a>
-  <a href="https://tauri.app" target="_blank">
-    <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-  </a>
-  <a href="https://kit.svelte.dev" target="_blank">
-    <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-  </a>
-</div>
-
-<p>Click on the Tauri, Vite, and Svelte logos to learn more.</p>
-
-<div class="row">
-  <Greet />
-</div>
-
-<div class="row">
-  <Login />
-</div>
-
-<style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
-</style>
+Root Page
+<input name="username" placeholder="Username" bind:value={$username}>
+<input name="password" type="password" placeholder="Password" bind:value={$password}>
+<input type="checkbox" name="auto-login" id="auto-login" bind:value={$autoLogin}>
+<label for="auto-login"> Auto-login </label>
+<button name="login" on:click={doLogin}> Sign In </button>
