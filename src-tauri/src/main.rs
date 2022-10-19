@@ -5,14 +5,9 @@
 
 use std::sync::Arc;
 
+use serde::Serialize;
 use tauri::{async_runtime::RwLock as AsyncRwLock, State};
-use f_chat_rs::{client::{Client, EventListener, Session, MessageSource, MessageTarget}, data::{Character, Channel}};
-
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use f_chat_rs::{client::{Client, EventListener, Session, MessageSource, MessageTarget}, data::{Character, Channel, Status}};
 
 // https://github.com/tauri-apps/tauri/issues/2533
 type AsyncVoid = Result<(),()>;
@@ -34,8 +29,28 @@ async fn login(client: State<'_, MaybeClient>, username: String, password: Strin
 async fn get_characters(client: State<'_, MaybeClient>) -> Result<Vec<Character>, ()> {
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic!");
-    assert!(client.channel_data.get(&Channel("Furries".to_owned())).is_none());
     Ok(client.own_characters.left_values().cloned().collect())
+}
+
+#[derive(Serialize)]
+struct RTCharacter {
+    name: Character,
+    status: Status
+}
+
+#[tauri::command]
+async fn get_friends(client: State<'_, MaybeClient>) -> Result<Vec<RTCharacter>, ()> {
+    let client_guard = client.client.read().await;
+    let client = client_guard.as_ref().expect("Too optimistic.");
+    let friends_guard = client.friends.read();
+    let friends = friends_guard.iter().map(|v| RTCharacter {
+        name: v.clone(),
+        status: client.character_data.get(v)
+            .map(|c|c.status)
+            .unwrap_or(Status::Offline) // Default is not Offline and that's my fault.
+    }).collect();
+
+    Ok(friends)
 }
 
 #[tauri::command]
@@ -67,7 +82,7 @@ async fn main() {
 
     tauri::Builder::default()
         .manage(client)
-        .invoke_handler(tauri::generate_handler![greet, login, get_characters, start_session])
+        .invoke_handler(tauri::generate_handler![login, get_characters, get_friends, start_session])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

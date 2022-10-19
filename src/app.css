@@ -14,7 +14,7 @@
   font-weight: 400;
 
   color: #f6f6f6;
-  background-color: #2f2f2f;
+  background-color: var(--color-gray-10);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -65,4 +65,27 @@ button:hover {
 input,
 button {
   outline: none;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Invert the FA icons for the dark theme. At a later time, this might not be necessary. */
+img[src^="/fa/"] {
+  filter: invert(100%);
+}
+
+* {
+  user-select: none; /* Make text unselectable by default. */
+}
+
+.clickable {
+  cursor: pointer;
 }

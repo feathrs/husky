@@ -1,5 +1,10 @@
-<script>
-  export let mainCharacter = "Alex Reaper";
+<script lang="ts">
+  import { sessions, currentSession } from "$lib/session";
+  import CharacterIcon, {ICON_LARGE, ICON_SMALL} from "$lib/CharacterIcon.svelte";
+  import { goto } from "$app/navigation";
+
+  let mainCharacter = $currentSession!;
+  let otherSessions = $sessions.slice(1);
 </script>
 <style lang="scss">
   #sidebar {
@@ -174,30 +179,62 @@
       top: calc(50% - 11px);
     }
   }
+
+  .section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 12px 12px 0px;
+
+    h4 {
+      margin: 0px;
+
+      flex: 1;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+      flex: none;
+    }
+  }
 </style>
 
 <div id="sidebar">
   <div id="character-header">
-    <div id="main-character" style="order:0;background-color:#434343;border-radius:4px;"></div> <!-- This will stand in for the moment -->
+    <CharacterIcon character={mainCharacter} {...ICON_LARGE}/>
     <div id="header-col">
       <!-- This is just so that we can stack the name and alt profiles -->
       <a href="_blank">{mainCharacter}</a>
       <div id="alt-characters">
-        <div class="alt-character" style="background-color:#434343"></div>
-        <div class="alt-character" style="background-color:#434343"></div>
-        <div id="alt-character-button">
+        {#each otherSessions as session}
+          <CharacterIcon character={session} {...ICON_SMALL}/>
+        {/each}
+        <div class:clickable={true} id="alt-character-button" on:click={async () => await goto("/characters")}>
           <img src="/fa/plus.svg" alt="add">
         </div>
       </div>
     </div>
   </div>
   <div id="sidebar-main">
-    <div id="people">
+    <div id="people" class:clickable={true}>
       <img src="/fa/user.svg" alt="person">
       <p>People</p>
     </div>
-    <div id="private-messages"></div>
-    <div id="channels"></div>
+    <div id="private-messages">
+      <div id="private-messages-header" class="section-header">
+        <h4>Private Messages</h4>
+        <img src="/fa/plus.svg" alt="add" class:clickable={true}>
+      </div>
+    </div>
+    <div id="channels">
+      <div id="channels-header" class="section-header">
+        <h4>Channels</h4>
+        <img src="/fa/plus.svg" alt="add" class:clickable={true}>
+      </div>
+    </div>
   </div>
   <div id="sidebar-footer">
     <div id="settings">

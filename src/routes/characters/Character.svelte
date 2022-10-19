@@ -11,7 +11,7 @@
 </script>
 
 <style lang="scss">
-    .char-container {
+  .char-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -23,10 +23,16 @@
     background: #1F1F1F;
     border: 1px solid #141414;
     border-radius: 4px;
+
+    cursor: pointer;
+  }
+
+  * {
+    user-select: none;
   }
 </style>
 
-<div class="char-container" style="cursor:pointer" on:click={handleClick}>
+<div class="char-container" on:click={handleClick}>
   <img alt="Character Avatar" src={getAvatar(character)}>
   <p>{character}</p>
 </div>
