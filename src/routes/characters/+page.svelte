@@ -1,29 +1,36 @@
 <!-- Character selection screen -->
+<script lang="ts" context="module">
+  // Remember the recent characters too
+  const recentCharacters = writable<string[]>(browser ? JSON.parse(window.localStorage.getItem("characters")??"[]") : []);
+  if (browser) {
+    recentCharacters.subscribe((v) => {
+      window.localStorage.setItem("characters", JSON.stringify(v));
+    }) 
+  }
+</script>
+
 <script lang="ts">
-  import { getCharacters, getOnlineFriends } from "$lib/rust";
+  import { getOwnCharacters } from "$lib/rust";
+  import { friends, syncFriends, characters, syncCharacters } from "$lib/data";
   import { onMount } from "svelte";
-  import { writable } from "svelte/store";
+  import { writable, derived } from "svelte/store";
   import { startSession } from "$lib/rust";
   import Characters from "./Characters.svelte";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import CharacterIcon, { ICON_SMALL } from "$lib/CharacterIcon.svelte";
 
-  // Remember the recent characters too
-  const recentCharacters = writable<string[]>(browser ? JSON.parse(window.localStorage.getItem("characters")??"[]") : []);
-  if (browser)
-    recentCharacters.subscribe((v) => {
-      window.localStorage.setItem("characters", JSON.stringify(v));
-    }) 
-
   // Characters list can't be gotten from page.ts
   // Svelte doesn't provide the "window" which causes Tauri to explode.
-  let characters: string[] = [];
-  let friends: string[] = [];
+  let own_characters: string[] = [];
+  let onlineFriends = derived([friends, characters], ([$friends, $characters]) => {
+    return $friends.filter((friend) => $characters[friend]?.status == "online");
+  })
 
   onMount(async () => {
-    characters = await getCharacters();
-    friends = await getOnlineFriends();
+    own_characters = await getOwnCharacters();
+    await syncFriends();
+    await syncCharacters();
   })
 
   async function chooseCharacter(event: CustomEvent<{character:string}>) {
@@ -129,14 +136,14 @@
     </div>
     <div id="divider"></div>
   {/if}
-  <Characters characters={characters} on:choice={chooseCharacter}/>
+  <Characters characters={own_characters} on:choice={chooseCharacter}/>
 </div>
-{#if friends.length > 0 }
+{#if $onlineFriends.length > 0 }
   <div id="friends-container">
     <h3>Online Friends</h3>
     <div id="friends">
       <!--Friends go in here-->
-      {#each friends as friend}
+      {#each $onlineFriends as friend}
         <CharacterIcon character={friend} {...ICON_SMALL}/>
       {/each}
     </div>

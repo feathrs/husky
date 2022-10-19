@@ -1,4 +1,7 @@
-import { derived, writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
+import * as rust from "./rust";
+import type { MessageTarget } from "./rust";
+import type { Channel, Character } from "./types";
 
 export const sessions = writable<string[]>([]);
 export const currentSession = derived(sessions, $sessions => $sessions.at(0) ?? null);
@@ -17,4 +20,22 @@ export function changeSession(newSession: string) {
     }
     return v;
   });
+}
+
+function thisSession() {
+  let session = get(currentSession);
+  if (session === null) throw new Error("No active session but attempted to perform session action");
+  return session;
+}
+
+export async function sendMessage(target: MessageTarget, message: string) {
+  await rust.sendMessage(thisSession(), target, message);
+}
+
+export async function sendDice(target: MessageTarget, dice: string) {
+  await rust.sendDice(thisSession(), target, dice);
+}
+
+export async function joinChannel(channel: Channel) {
+  await rust.joinChannel(thisSession(), channel);
 }
