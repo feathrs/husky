@@ -2,9 +2,14 @@
   import { sessions, currentSession } from "$lib/session";
   import CharacterIcon, {ICON_LARGE, ICON_SMALL} from "$lib/CharacterIcon.svelte";
   import { goto } from "$app/navigation";
+  import type { Channel, Character } from "$lib/types";
 
-  let mainCharacter = $currentSession!;
-  let otherSessions = $sessions.slice(1);
+  export let people: boolean;
+  export let character: Character;
+  export let channel: Channel;
+
+  $: mainCharacter = $currentSession!;
+  $: otherSessions = $sessions.slice(1);
 </script>
 <style lang="scss">
   #sidebar {
@@ -66,6 +71,14 @@
 
     margin: 0px 12px;
 
+    &.selected {
+      background: var(--color-gray-9);
+
+      p {
+        font-weight: 700;
+      }
+    }
+
     img {
       filter: invert(100%);
       height: 24px;
@@ -84,15 +97,19 @@
       flex: none;
       order: 1;
       flex-grow: 1;
+
+      font-weight: 400;
     }
   }
 
   #private-messages {
-
+    display: flex;
+    flex-direction: column;
   }
 
   #channels {
-
+    display: flex;
+    flex-direction: column;
   }
 
   #sidebar-footer {
@@ -200,6 +217,15 @@
       flex: none;
     }
   }
+
+  input {
+    box-sizing: border-box;
+
+    width: auto;
+    padding: 8px 12px;
+    margin: 0px 8px;
+    font-size: 12px;
+  }
 </style>
 
 <div id="sidebar">
@@ -219,7 +245,7 @@
     </div>
   </div>
   <div id="sidebar-main">
-    <div id="people" class:clickable={true}>
+    <div id="people" class:clickable={true} class:selected={people}>
       <img src="/fa/user.svg" alt="person">
       <p>People</p>
     </div>
@@ -228,6 +254,8 @@
         <h4>Private Messages</h4>
         <img src="/fa/plus.svg" alt="add" class:clickable={true}>
       </div>
+      <input placeholder="Character Name..." name="new-pm" id="new-pm">
+
     </div>
     <div id="channels">
       <div id="channels-header" class="section-header">

@@ -1,6 +1,8 @@
-<script>
+<script lang="ts">
   import Sidebar from "./Sidebar.svelte";
+  import type { LayoutData } from "./$types";
 
+  export let data: LayoutData;
 </script>
 <style lang="scss">
   #main-app {
@@ -16,7 +18,7 @@
   }
 </style>
 <div id="main-app">
-  <Sidebar/>
+  <Sidebar {...data}/>
   <div id="main">
     <slot></slot>
   </div>

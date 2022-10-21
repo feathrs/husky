@@ -21,8 +21,11 @@
 
 <style lang="scss">
   #container {
+    display: block;
     width: var(--icon-size);
     height: var(--icon-size);
+
+    line-height: 0px;
 
     img {
       border-radius: calc(var(--icon-size) / 8);
@@ -34,10 +37,11 @@
 
   #status {
     box-sizing: border-box;
+    display: inline-block;
 
     position: relative;
     left: calc(100% - var(--status-size));
-    bottom: calc(var(--status-size) * 1.5);
+    top: calc(0px - var(--status-size));
 
     width: var(--status-size);
     height: var(--status-size);
@@ -59,7 +63,7 @@
     &.busy {
       background-color: #d87a16;
     }
-    &.do-not-disturb {
+    &.do_not_disturb {
       background-color: #d32029;
     }
     &.offline {

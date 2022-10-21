@@ -38,7 +38,7 @@
     if (newRecent.unshift(event.detail.character) > 6) newRecent.pop();
     $recentCharacters = newRecent;
     await startSession(event.detail.character);
-    await goto("/app-main", {replaceState: true, state: []});
+    await goto("/people/everyone", {replaceState: true, state: []});
   }
 </script>
 

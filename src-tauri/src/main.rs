@@ -90,6 +90,15 @@ async fn get_channel(client: ClientState<'_>, channel: Channel) -> Result<Option
     Ok(client.channel_data.get(&channel).map(|v|v.clone()))
 }
 
+#[tauri::command]
+async fn get_sessions(client: ClientState<'_>) -> Result<Vec<Character>, ()> {
+    let client_guard = client.client.read().await;
+    Ok(client_guard.as_ref().map_or(
+        Vec::new(), 
+        |client| client.get_sessions().drain(..).map(|v| v.character.clone()).collect()
+    ))
+}
+
 #[derive(serde::Deserialize)]
 enum MessageTarget {
     Channel {channel: Channel},
@@ -101,7 +110,7 @@ async fn session_send_message(client: ClientState<'_>, session: Character, targe
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic (session_send_message)");
 
-    let session = client.get_session(session).expect("Bad session provided (session_send_message)");
+    let session = client.get_session(&session).expect("Bad session provided (session_send_message)");
     session.send_message(match target {
         MessageTarget::Channel { channel } => SessionMessageTarget::Channel(channel),
         MessageTarget::Character { character } => SessionMessageTarget::PrivateMessage(character)
@@ -114,7 +123,7 @@ async fn session_send_dice(client: ClientState<'_>, session: Character, target: 
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic (session_send_dice)");
 
-    let session = client.get_session(session).expect("Bad session provided (session_send_dice)");
+    let session = client.get_session(&session).expect("Bad session provided (session_send_dice)");
     session.send_dice(match target {
         MessageTarget::Channel { channel } => SessionMessageTarget::Channel(channel),
         MessageTarget::Character { character } => SessionMessageTarget::PrivateMessage(character)
@@ -127,7 +136,7 @@ async fn session_join_channel(client: ClientState<'_>, session: Character, chann
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic (join_channel)");
 
-    let session = client.get_session(session).expect("Bad session provided (join_channel)");
+    let session = client.get_session(&session).expect("Bad session provided (join_channel)");
     session.join_channel(channel).await.expect("Client error (join_channel)");
     Ok(())
 }
@@ -163,6 +172,7 @@ async fn main() {
             get_channel,
             get_character,
             get_all_characters,
+            get_sessions,
             session_send_message,
             session_send_dice,
             session_join_channel

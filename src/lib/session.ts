@@ -2,9 +2,15 @@ import { derived, get, writable } from "svelte/store";
 import * as rust from "./rust";
 import type { MessageTarget } from "./rust";
 import type { Channel, Character } from "./types";
+import { browser } from "$app/environment";
 
 export const sessions = writable<string[]>([]);
 export const currentSession = derived(sessions, $sessions => $sessions.at(0) ?? null);
+
+export const sessionPMs = writable<Record<Character, Set<Character>>>({});
+export const sessionChannels = writable<Record<Character, Set<Channel>>>({});
+
+if (browser) rust.getSessions().then((v) => sessions.set(v));
 
 export function changeSession(newSession: string) {
   sessions.update((v) => {
@@ -38,4 +44,27 @@ export async function sendDice(target: MessageTarget, dice: string) {
 
 export async function joinChannel(channel: Channel) {
   await rust.joinChannel(thisSession(), channel);
+}
+
+// Semantically, this just "shows" the PM
+export function startPM(character: Character) {
+  sessionPMs.update((v) => {
+    let session = thisSession();
+    let sessionData = v[session] ?? new Set();
+    sessionData.add(character);
+
+    v[session] = sessionData;
+    return v;
+  })
+}
+
+export function closePM(character: Character) {
+  sessionPMs.update((v) => {
+    let session = thisSession();
+    let sessionData = v[session] ?? new Set();
+    sessionData.delete(character);
+
+    v[session] = sessionData;
+    return v;
+  })
 }
