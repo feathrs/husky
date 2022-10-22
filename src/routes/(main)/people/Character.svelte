@@ -40,7 +40,7 @@
       &Herm {
         color: #854eca;
       }
-      &Dickgirl {
+      &Shemale {
         color: #ab7ae0;
       }
       &Female {

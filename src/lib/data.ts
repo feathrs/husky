@@ -32,6 +32,9 @@ if (browser) {
       return v;
     })
   })
+  syncBookmarks();
+  syncFriends();
+  syncCharacters();
 }
 
 export async function syncBookmarks() {

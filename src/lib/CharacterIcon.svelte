@@ -60,6 +60,9 @@
     &.away {
       background-color: #d8bd14;
     }
+    &.idle {
+      @extend .away;
+    }
     &.busy {
       background-color: #d87a16;
     }

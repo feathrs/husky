@@ -53,8 +53,7 @@ async fn get_friends(client: ClientState<'_>) -> Result<Vec<Character>, ()> {
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic (get_friends)");
 
-    let friends_guard = client.friends.read();
-    Ok(friends_guard.clone())
+    Ok(client.friends.iter().map(|v|v.clone()).collect())
 }
 
 #[tauri::command]
@@ -62,7 +61,7 @@ async fn get_bookmarks(client: ClientState<'_>) -> Result<Vec<Character>, ()> {
     let client_guard = client.client.read().await;
     let client = client_guard.as_ref().expect("Too optimistic (get_bookmarks)");
 
-    Ok(client.bookmarks.clone())
+    Ok(client.bookmarks.iter().map(|v|v.clone()).collect())
 }
 
 #[tauri::command]
