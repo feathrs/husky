@@ -16,7 +16,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    flex: auto;
+    flex: 0 1 content;
     gap: 12px;
   }
 </style>
