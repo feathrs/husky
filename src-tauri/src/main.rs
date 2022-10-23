@@ -98,6 +98,12 @@ async fn get_sessions(client: ClientState<'_>) -> Result<Vec<Character>, ()> {
     ))
 }
 
+#[tauri::command]
+async fn get_recents(character: Character) -> Result<Vec<Character>, ()> {
+    Ok(vec![]) // For now, this is not backed by anything.
+    // Later, back this with a cache which is updated when messages are sent in DMs.
+}
+
 #[derive(serde::Deserialize)]
 enum MessageTarget {
     Channel {channel: Channel},
@@ -172,6 +178,7 @@ async fn main() {
             get_character,
             get_all_characters,
             get_sessions,
+            get_recents,
             session_send_message,
             session_send_dice,
             session_join_channel

@@ -47,8 +47,12 @@ export function getAllCharacters(): Promise<Record<Character, CharacterData>> {
   return invoke("get_all_characters");
 }
 
-export async function getSessions(): Promise<Character[]> {
+export function getSessions(): Promise<Character[]> {
   return invoke("get_sessions", {}); // This is mostly just for dev purposes, to sync sessions on module reload.
+}
+
+export function getRecents(character: Character): Promise<Character[]> {
+  return invoke("get_recents", { character }); // Session
 }
 
 // Session functions (all take session)

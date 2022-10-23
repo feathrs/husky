@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { friends, characters } from "$lib/data";
+  import { friends, characters, syncFriends, syncCharacters } from "$lib/data";
+  import { onMount } from "svelte";
   import Character from "../Character.svelte";
 
   $: friendsWithStatus = $friends.map((v) => {return { character: v, status: $characters[v]?.status??"offline", gender: $characters[v]?.gender??"none" }});
   $: groupOnlineFriends = friendsWithStatus.filter((v) => v.status !== "offline");
   $: groupOfflineFriends = friendsWithStatus.filter((v) => v.status === "offline");
+
+  onMount(() => {
+    syncFriends();
+    syncCharacters();
+  });
 </script>
 
 <style lang="scss">
@@ -12,7 +18,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    flex: auto;
+    flex: 0 1 content;
     gap: 12px;
   }
 

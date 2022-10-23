@@ -12,7 +12,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.1.0"
+    "@tauri-apps/api": "^1.1.0",
+    "@types/lodash.uniqwith": "^4.5.7",
+    "lodash.uniqwith": "^4.5.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "next",

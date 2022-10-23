@@ -15,6 +15,9 @@
   }
   #main {
     grid-area: main;
+    max-height: 100vh;
+    overflow: hidden;
+    overflow-x: clip;
   }
 </style>
 <div id="main-app">

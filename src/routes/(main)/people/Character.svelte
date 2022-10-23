@@ -13,7 +13,7 @@
     flex-flow: row wrap;
     align-items: center;
     overflow: clip;
-    flex: auto;
+    height: min-content;
 
     padding: 0px;
     padding-right: 12px;

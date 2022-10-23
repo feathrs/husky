@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { bookmarks, characters } from "$lib/data";
+  import { bookmarks, characters, syncBookmarks, syncCharacters } from "$lib/data";
+  import { onMount } from "svelte";
   import Character from "../Character.svelte";
 
   $: bookmarksWithStatus = $bookmarks.map((v) => {return { character: v, status: $characters[v]?.status??"offline", gender: $characters[v]?.gender??"none" }});
   $: groupOnlineBookmarks = bookmarksWithStatus.filter((v) => v.status !== "offline");
   $: groupOfflineBookmarks = bookmarksWithStatus.filter((v) => v.status === "offline");
+
+  onMount(() => {
+    syncBookmarks();
+    syncCharacters();
+  });
 </script>
 
 <style lang="scss">
@@ -12,7 +18,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    flex: auto;
+    flex: 0 1 content;
     gap: 12px;
   }
 
