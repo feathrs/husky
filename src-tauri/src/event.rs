@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use tokio::sync::mpsc::Sender;
 
-use f_chat_rs::{client::{async_trait, EventListener, Session, MessageSource, MessageTarget}, data::{Channel, Character}};
+use f_chat_rs::{client::{async_trait, EventListener}, data::{Channel, Character}};
 use serde::Serialize;
 use tauri::{Manager, Runtime};
 

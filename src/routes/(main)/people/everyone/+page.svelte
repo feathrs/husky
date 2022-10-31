@@ -70,6 +70,7 @@
     return s1 == s2 ? v1.character.localeCompare(v2.character) : s1 - s2;
   }
   
+  // TODO: Fix sorting; it's broken and I don't know why.
   $: sortedAll = uniqWith([friendsWithStatus.sort(compare), bookmarksWithStatus.sort(compare), populatedRecents.sort(compare)].reduce(merge), (a: CharacterData, b: CharacterData) => a.character == b.character);
   $: sortedOnline = sortedAll.filter((v) => v.status !== "offline");
   $: sortedOffline = sortedAll.filter((v) => v.status === "offline");

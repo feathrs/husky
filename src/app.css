@@ -1,3 +1,21 @@
+/* Inter typeface (multi-axis not used, therefore not included; only supported in Firefox) */
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+  font-named-instance: 'Regular';
+  src: url("/inter/Inter-roman.var.woff2") format("woff2");
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: italic;
+  font-named-instance: 'Italic';
+  src: url("/inter/Inter-italic.var.woff2") format("woff2");
+}
+
 :root {
   --color-gray-12: #141414;
   --color-gray-11: #1f1f1f;

@@ -7,7 +7,7 @@ use std::{sync::Arc, collections::BTreeMap};
 
 use tokio::sync::{mpsc::Sender, RwLock as AsyncRwLock};
 use tauri::{State};
-use f_chat_rs::{client::{Client, CharacterData, ChannelData, MessageTarget as SessionMessageTarget}, data::{Character, Channel, Status}};
+use f_chat_rs::{client::{Client, CharacterData, ChannelData, MessageTarget as SessionMessageTarget, MessageSource}, data::{Character, Channel, Status}};
 
 mod event;
 
@@ -104,10 +104,27 @@ async fn get_recents(character: Character) -> Result<Vec<Character>, ()> {
     // Later, back this with a cache which is updated when messages are sent in DMs.
 }
 
+#[tauri::command]
+async fn get_messages(client: ClientState<'_>, session: Character, target: MessageTarget) -> Result<Vec<Message>, ()> {
+    Ok(vec![])
+}
+
 #[derive(serde::Deserialize)]
 enum MessageTarget {
     Channel {channel: Channel},
     Character {character: Character}
+}
+
+#[derive(serde::Deserialize)]
+struct Message {
+    from: MessageSource,
+    content: MessageContent
+}
+
+#[derive(serde::Deserialize)]
+enum MessageContent {
+    Message {message: String},
+    Emote {emote: String}
 }
 
 #[tauri::command]

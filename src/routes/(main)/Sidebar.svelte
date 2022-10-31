@@ -151,6 +151,8 @@
     align-items: left;
 
     a {
+      font-weight: 500;
+      font-size: 14px;
       text-align: left;
       align-self: stretch;
       color: rgba(255, 255, 255, 0.97);
@@ -245,7 +247,7 @@
     </div>
   </div>
   <div id="sidebar-main">
-    <div id="people" class:clickable={true} class:selected={people}>
+    <div id="people" class:clickable={true} class:selected={people} on:click={() => goto("/people/everyone")}>
       <img src="/fa/user.svg" alt="person">
       <p>People</p>
     </div>

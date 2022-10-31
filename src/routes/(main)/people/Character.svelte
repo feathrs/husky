@@ -1,6 +1,7 @@
 <script lang="ts">
   import CharacterIcon, { ICON_SMALL } from "$lib/CharacterIcon.svelte";
   import type { Character } from "$lib/types";
+  import { goto } from "$app/navigation";
 
   export let character: Character;
   export let status: string = "offline";
@@ -56,7 +57,7 @@
   }
 </style>
 
-<div id="character-container" class="clickable gender-{gender}" on:click>
+<div id="character-container" class="clickable gender-{gender}" on:click={(e)=>goto(`/private-messages/${character}/`)}>
   <CharacterIcon {character} {status} {...ICON_SMALL}/>
   {character}
 </div>

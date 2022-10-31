@@ -67,3 +67,7 @@ export async function sendDice(session: Character, target: MessageTarget, dice: 
 export async function joinChannel(session: Character, channel: Channel) {
   await invoke("session_join_channel", { session, channel });
 }
+
+export async function getMessages(session: Character, target: MessageTarget) {
+  await invoke("session_get_messages", { session, target });
+}
