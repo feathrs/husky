@@ -293,6 +293,7 @@ async fn main() {
             get_all_characters,
             get_sessions,
             get_recents,
+            get_messages,
             session_send_message,
             session_send_dice,
             session_join_channel

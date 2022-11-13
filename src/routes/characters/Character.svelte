@@ -6,9 +6,14 @@
   const dispatcher = createEventDispatcher();
 
   function handleClick() {
-    dispatcher("choice", {character});
+    dispatcher("choice", { character });
   }
 </script>
+
+<div class="char-container" on:click={handleClick}>
+  <img alt="Character Avatar" src={getAvatar(character)} />
+  <p>{character}</p>
+</div>
 
 <style lang="scss">
   .char-container {
@@ -18,9 +23,9 @@
     padding: 12px 8px;
     gap: 12px;
     width: fill;
+    overflow-wrap: anywhere;
 
-
-    background: #1F1F1F;
+    background: #1f1f1f;
     border: 1px solid #141414;
     border-radius: 4px;
 
@@ -31,8 +36,3 @@
     user-select: none;
   }
 </style>
-
-<div class="char-container" on:click={handleClick}>
-  <img alt="Character Avatar" src={getAvatar(character)}>
-  <p>{character}</p>
-</div>
