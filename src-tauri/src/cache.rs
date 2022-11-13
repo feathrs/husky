@@ -208,28 +208,25 @@ impl f_chat_rs::cache::Cache for Cache {
         data: PartialUserData,
     ) -> Result<bool, Self::Error> {
         let mut changed = false;
-        self.characters
-            .entry(character.into_owned())
-            .and_modify(|v| {
-                if let Some(gender) = data.gender {
-                    if v.gender != gender {
-                        changed = true;
-                        v.gender = gender;
-                    }
-                }
-                if let Some(status) = data.status {
-                    if v.status != status {
-                        changed = true;
-                        v.status = status;
-                    }
-                }
-                if let Some(message) = data.status_message {
-                    if &v.status_message != &message {
-                        changed = true;
-                        v.status_message = message.into_owned();
-                    }
-                }
-            });
+        let mut v = self.characters.entry(character.into_owned()).or_default();
+        if let Some(gender) = data.gender {
+            if v.gender != gender {
+                changed = true;
+                v.gender = gender;
+            }
+        }
+        if let Some(status) = data.status {
+            if v.status != status {
+                changed = true;
+                v.status = status;
+            }
+        }
+        if let Some(message) = data.status_message {
+            if &v.status_message != &message {
+                changed = true;
+                v.status_message = message.into_owned();
+            }
+        }
         Ok(changed)
     }
 
