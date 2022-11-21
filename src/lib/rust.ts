@@ -1,15 +1,12 @@
 // This is where I'm packing all of the functions for talking to Tauri backend
 import { invoke } from "@tauri-apps/api/tauri";
 import { sessions } from "$lib/session";
-import type { Channel, ChannelData, Character, CharacterData } from "$lib/types";
-
+import type { Channel, ChannelData, Character, CharacterData, Message, MessageChannel, MessageTarget } from "$lib/types";
 
 export type RTCharacter = {
   name: string,
   status: string
 }
-
-export type MessageTarget = { character: Character } | { channel: Channel };
 
 export function login(username: string, password: string) {
   return invoke("login", { username, password });
@@ -68,6 +65,6 @@ export async function joinChannel(session: Character, channel: Channel) {
   await invoke("session_join_channel", { session, channel });
 }
 
-export async function getMessages(session: Character, target: MessageTarget) {
-  await invoke("session_get_messages", { session, target });
+export async function getMessages(channel: MessageChannel): Promise<Message[]> {
+  return await invoke("get_messages", { channel });
 }

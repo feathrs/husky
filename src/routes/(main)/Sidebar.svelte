@@ -1,6 +1,9 @@
 <script lang="ts">
   import { sessions, currentSession } from "$lib/session";
-  import CharacterIcon, {ICON_LARGE, ICON_SMALL} from "$lib/CharacterIcon.svelte";
+  import CharacterIcon, {
+    ICON_LARGE,
+    ICON_SMALL,
+  } from "$lib/CharacterIcon.svelte";
   import { goto } from "$app/navigation";
   import type { Channel, Character } from "$lib/types";
 
@@ -8,9 +11,85 @@
   export let character: Character;
   export let channel: Channel;
 
+  let pmCharacter = "";
+
   $: mainCharacter = $currentSession!;
   $: otherSessions = $sessions.slice(1);
 </script>
+
+<div id="sidebar">
+  <div id="character-header">
+    <CharacterIcon character={mainCharacter} {...ICON_LARGE} />
+    <div id="header-col">
+      <!-- This is just so that we can stack the name and alt profiles -->
+      <a href="_blank">{mainCharacter}</a>
+      <div id="alt-characters">
+        {#each otherSessions as session}
+          <CharacterIcon character={session} {...ICON_SMALL} />
+        {/each}
+        <div
+          class:clickable={true}
+          id="alt-character-button"
+          on:click={async () => await goto("/characters")}
+        >
+          <img src="/fa/plus.svg" alt="add" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-main">
+    <div
+      id="people"
+      class:clickable={true}
+      class:selected={people}
+      on:click={() => goto("/people/everyone")}
+    >
+      <img src="/fa/user.svg" alt="person" />
+      <p>People</p>
+    </div>
+    <div id="private-messages">
+      <div id="private-messages-header" class="section-header">
+        <h4>Private Messages</h4>
+        <img
+          src="/fa/plus.svg"
+          alt="add"
+          class:clickable={true}
+          on:click={(e) => goto(`/private-messages/${pmCharacter}/`)}
+        />
+      </div>
+      <input
+        placeholder="Character Name..."
+        name="new-pm"
+        id="new-pm"
+        bind:value={pmCharacter}
+      />
+    </div>
+    <div id="channels">
+      <div id="channels-header" class="section-header">
+        <h4>Channels</h4>
+        <img src="/fa/plus.svg" alt="add" class:clickable={true} />
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-footer">
+    <div id="settings">
+      <img src="/fa/gear.svg" alt="Settings" />
+    </div>
+    <div id="ads">
+      <img src="/fa/rectangle-ad.svg" alt="Ads" />
+    </div>
+    <div id="logs">
+      <img src="/fa/file-lines.svg" alt="Logs" />
+    </div>
+    <div id="console">
+      <img src="/fa/terminal.svg" alt="Console" />
+    </div>
+    <div id="sign-out">
+      <img src="/fa/right-from-bracket.svg" alt="Sign-Out" />
+    </div>
+  </div>
+</div>
+
 <style lang="scss">
   #sidebar {
     box-sizing: border-box;
@@ -229,58 +308,3 @@
     font-size: 12px;
   }
 </style>
-
-<div id="sidebar">
-  <div id="character-header">
-    <CharacterIcon character={mainCharacter} {...ICON_LARGE}/>
-    <div id="header-col">
-      <!-- This is just so that we can stack the name and alt profiles -->
-      <a href="_blank">{mainCharacter}</a>
-      <div id="alt-characters">
-        {#each otherSessions as session}
-          <CharacterIcon character={session} {...ICON_SMALL}/>
-        {/each}
-        <div class:clickable={true} id="alt-character-button" on:click={async () => await goto("/characters")}>
-          <img src="/fa/plus.svg" alt="add">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="sidebar-main">
-    <div id="people" class:clickable={true} class:selected={people} on:click={() => goto("/people/everyone")}>
-      <img src="/fa/user.svg" alt="person">
-      <p>People</p>
-    </div>
-    <div id="private-messages">
-      <div id="private-messages-header" class="section-header">
-        <h4>Private Messages</h4>
-        <img src="/fa/plus.svg" alt="add" class:clickable={true}>
-      </div>
-      <input placeholder="Character Name..." name="new-pm" id="new-pm">
-
-    </div>
-    <div id="channels">
-      <div id="channels-header" class="section-header">
-        <h4>Channels</h4>
-        <img src="/fa/plus.svg" alt="add" class:clickable={true}>
-      </div>
-    </div>
-  </div>
-  <div id="sidebar-footer">
-    <div id="settings">
-      <img src="/fa/gear.svg" alt="Settings">
-    </div>
-    <div id="ads">
-      <img src="/fa/rectangle-ad.svg" alt="Ads">
-    </div>
-    <div id="logs">
-      <img src="/fa/file-lines.svg" alt="Logs">
-    </div>
-    <div id="console">
-      <img src="/fa/terminal.svg" alt="Console">
-    </div>
-    <div id="sign-out">
-      <img src="/fa/right-from-bracket.svg" alt="Sign-Out">
-    </div>
-  </div>
-</div>

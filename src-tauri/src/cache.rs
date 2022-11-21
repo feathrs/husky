@@ -5,8 +5,8 @@ use dashmap::{DashMap, DashSet};
 use f_chat_rs::{
     cache::{PartialChannelData, PartialUserData},
     data::{
-        Channel, ChannelData, ChannelMode, Character, CharacterData, FriendRelation, Message,
-        MessageChannel, MessageContent,
+        Channel, ChannelData, ChannelMode, Character, CharacterData, FriendRelation, Gender,
+        Message, MessageChannel, MessageContent, Status,
     },
     util::Timestamp,
 };
@@ -16,7 +16,7 @@ use thiserror::Error;
 #[derive(Debug, Default)]
 pub struct Cache {
     channels: DashMap<Channel, CacheChannelData>,
-    characters: DashMap<Character, CharacterData>,
+    characters: DashMap<Character, CacheCharacterData>,
     messages: DashMap<MessageChannel, Vec<Message>>,
     ads: DashMap<Channel, Vec<Message>>,
     bookmarks: DashSet<Character>,
@@ -33,6 +33,13 @@ struct CacheChannelData {
     pub ops: DashSet<Character>,
     pub description: String,
     pub title: String,
+}
+
+#[derive(Debug, Default)]
+struct CacheCharacterData {
+    pub gender: Gender,
+    pub status: Status,
+    pub status_message: String,
 }
 
 impl Cache {
@@ -332,11 +339,25 @@ impl f_chat_rs::cache::Cache for Cache {
     }
 
     fn get_character(&self, character: &Character) -> Result<Option<CharacterData>, Self::Error> {
-        Ok(self.characters.get(character).map(|v| v.clone()))
+        Ok(self.characters.get(character).map(|v| CharacterData {
+            character: *character,
+            gender: v.gender,
+            status: v.status,
+            status_message: v.status_message.clone(),
+        }))
     }
 
     fn get_characters(&self) -> Result<Cow<[CharacterData]>, Self::Error> {
-        Ok(self.characters.iter().map(|v| v.clone()).collect())
+        Ok(self
+            .characters
+            .iter()
+            .map(|v| CharacterData {
+                character: *v.key(),
+                gender: v.gender,
+                status: v.status,
+                status_message: v.status_message.clone(),
+            })
+            .collect())
     }
 
     fn get_messages(
@@ -356,7 +377,9 @@ impl f_chat_rs::cache::Cache for Cache {
                     .rev()
                     .take(limit.unwrap_or(80).try_into().unwrap())
                     .map(|v| v.clone())
+                    .rev()
                     .collect()
+                // This is really stupid and I should just slice from the back and clone.
             })
             .map_or(Default::default(), |v| Cow::Owned(v)))
     }

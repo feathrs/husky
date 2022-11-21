@@ -3,18 +3,19 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use f_chat_rs::{
     cache::Cache,
     client::{Client, ClientBuilder},
-    data::{Channel, ChannelData, Character, CharacterData, Message, MessageChannel},
+    data::{self as f_data, Channel, ChannelData, Character, CharacterData, Message},
     protocol::Target,
 };
 use tauri::State;
 use tokio::sync::{mpsc::Sender, RwLock as AsyncRwLock};
 
 mod cache;
+mod data;
 mod event;
 
 // https://github.com/tauri-apps/tauri/issues/2533
@@ -91,13 +92,27 @@ async fn get_bookmarks(client: ClientState<'_>) -> Result<Vec<Character>, cache:
 #[tauri::command]
 async fn get_all_characters(
     client: ClientState<'_>,
-) -> Result<Vec<CharacterData>, cache::CacheError> {
+) -> Result<HashMap<Character, data::CharacterDataInner>, cache::CacheError> {
     let client_guard = client.client.read().await;
     let client = client_guard
         .as_ref()
         .expect("Too optimistic (get_all_characters)");
 
-    client.cache.get_characters().map(|v| v.into_owned())
+    client.cache.get_characters().map(|v| {
+        v.into_owned()
+            .drain(..)
+            .map(|v| {
+                (
+                    v.character,
+                    data::CharacterDataInner {
+                        status: v.status,
+                        gender: v.gender,
+                        status_message: v.status_message,
+                    },
+                )
+            })
+            .collect()
+    })
 }
 
 #[tauri::command]
@@ -145,8 +160,7 @@ async fn get_recents(character: Character) -> Result<Vec<Character>, ()> {
 #[tauri::command]
 async fn get_messages(
     client: ClientState<'_>,
-    session: Character,
-    target: MessageTarget,
+    channel: MessageChannel,
 ) -> Result<Vec<Message>, cache::CacheError> {
     let client_guard = client.client.read().await;
     let client = client_guard
@@ -155,24 +169,32 @@ async fn get_messages(
 
     client
         .cache
-        .get_messages(&target.into_message_channel(session), None, Some(80))
+        .get_messages(&channel.into(), None, Some(80))
         .map(|v| v.into_owned())
 }
 
-#[derive(serde::Deserialize)]
-// Bad idea; equivalent to protocol::Target with different field names
-enum MessageTarget {
-    Channel { channel: Channel },
-    Character { character: Character },
+#[derive(serde::Deserialize, Debug)]
+#[serde(untagged)]
+// This is MessageChannel from f_chat_rs, but for a language without typed unions.
+// Maybe at a later time I'll go back to f_chat_rs and redesign how these are all described.
+enum MessageChannel {
+    Channel {
+        channel: Channel,
+    },
+    Character {
+        own_character: Character,
+        other_character: Character,
+    },
 }
 
-impl MessageTarget {
-    pub fn into_message_channel(self, session: Character) -> MessageChannel {
+impl Into<f_data::MessageChannel> for MessageChannel {
+    fn into(self) -> f_data::MessageChannel {
         match self {
-            MessageTarget::Channel { channel } => MessageChannel::Channel(channel),
-            MessageTarget::Character { character } => {
-                MessageChannel::PrivateMessage(session, character)
-            }
+            MessageChannel::Channel { channel } => f_data::MessageChannel::Channel(channel),
+            MessageChannel::Character {
+                own_character,
+                other_character,
+            } => f_data::MessageChannel::PrivateMessage(own_character, other_character),
         }
     }
 }
@@ -181,7 +203,7 @@ impl MessageTarget {
 async fn session_send_message(
     client: ClientState<'_>,
     session: Character,
-    target: MessageTarget,
+    target: Target,
     message: String,
 ) -> AsyncVoid {
     let client_guard = client.client.read().await;
@@ -193,15 +215,7 @@ async fn session_send_message(
         .get_session(&session)
         .expect("Bad session provided (session_send_message)");
     session
-        .send_message(
-            match target {
-                MessageTarget::Channel { channel } => Target::Channel { channel },
-                MessageTarget::Character { character } => Target::Character {
-                    recipient: character,
-                },
-            },
-            message,
-        )
+        .send_message(target, message)
         .await
         .expect("Client error (session_send_message)");
     Ok(())
@@ -211,7 +225,7 @@ async fn session_send_message(
 async fn session_send_dice(
     client: ClientState<'_>,
     session: Character,
-    target: MessageTarget,
+    target: Target,
     dice: String,
 ) -> AsyncVoid {
     let client_guard = client.client.read().await;
@@ -223,15 +237,7 @@ async fn session_send_dice(
         .get_session(&session)
         .expect("Bad session provided (session_send_dice)");
     session
-        .send_dice(
-            match target {
-                MessageTarget::Channel { channel } => Target::Channel { channel },
-                MessageTarget::Character { character } => Target::Character {
-                    recipient: character,
-                },
-            },
-            dice,
-        )
+        .send_dice(target, dice)
         .await
         .expect("Client error (session_send_dice)");
     Ok(())

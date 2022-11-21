@@ -6,7 +6,7 @@
 import { writable } from "svelte/store";
 import { listen } from '@tauri-apps/api/event';
 import type { Event } from '@tauri-apps/api/event';
-import { getFriends, getBookmarks, getChannel, getCharacter, getAllCharacters} from "$lib/rust";
+import { getFriends, getBookmarks, getChannel, getCharacter, getAllCharacters } from "$lib/rust";
 import type { Channel, Character, ChannelData, CharacterData } from "./types";
 import { browser } from "$app/environment";
 
@@ -46,7 +46,9 @@ export async function syncFriends() {
 }
 
 export async function syncCharacters() {
-  characters.set(await getAllCharacters());
+  let chars = await getAllCharacters();
+  console.log(chars);
+  characters.set(chars);
 }
 
 // No syncChannels?

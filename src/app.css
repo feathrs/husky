@@ -7,6 +7,7 @@
   font-named-instance: 'Regular';
   src: url("/inter/Inter-roman.var.woff2") format("woff2");
 }
+
 @font-face {
   font-family: 'Inter';
   font-weight: 100 900;
@@ -97,15 +98,23 @@ button {
   flex-direction: column;
 }
 
+.spreader {
+  align-self: stretch;
+  flex-grow: 1;
+}
+
 /* Invert the FA icons for the dark theme. At a later time, this might not be necessary. */
 img[src^="/fa/"] {
   filter: invert(100%);
 }
 
 * {
-  user-select: none; /* Make text unselectable by default. */
-  box-sizing: border-box; /* Make borders "inside" by default. */
-  scrollbar-width: thin; /* Try to use thin scrollbars if the frontend supports it */
+  user-select: none;
+  /* Make text unselectable by default. */
+  box-sizing: border-box;
+  /* Make borders "inside" by default. */
+  scrollbar-width: thin;
+  /* Try to use thin scrollbars if the frontend supports it */
 }
 
 .clickable {
